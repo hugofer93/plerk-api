@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  api:
+    environment:
+      DEBUG: "true"
+    volumes:
+      - .:/opt/plerk
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "poetry install --no-root
+      && poetry run python manage.py makemigrations --noinput
+      && poetry run python manage.py migrate --noinput
+      && poetry run python manage.py runserver 0:8000"

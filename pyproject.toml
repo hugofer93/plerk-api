@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "plerk-api"
+version = "0.1.0"
+description = "REST API test"
+authors = ["Hugo Silva <hugofer93@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "~3.8"
+python-dotenv = "~0.20"
+Django = "~3.2"
+djangorestframework = "~3.13"
+drf-spectacular = "~0.22"
+drf-ujson2 = "~1.6"
+psycopg2 = "~2.9"
+uWSGI = "~2.0"
+
+[tool.poetry.dev-dependencies]
+django-silk = "~4.3"
+
+[build-system]
