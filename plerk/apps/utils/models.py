@@ -14,6 +14,7 @@ class BaseModel(Model):
 
     class Meta:
         abstract = True
+        ordering = ('-creation_date', )
 
 
 class BaseUUIDModel(BaseModel):
