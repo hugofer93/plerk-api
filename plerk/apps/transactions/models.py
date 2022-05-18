@@ -22,10 +22,10 @@ class Transaction(BaseUUIDModel):
     )
 
     company = ForeignKey(Company, on_delete=PROTECT)
-    price = DecimalField(max_digits=8, decimal_places=2)
+    price = DecimalField(max_digits=10, decimal_places=2)
     date = DateTimeField()
     status = CharField(max_length=10, choices=STATUS_CHOICES)
-    approval_status = BooleanField()
+    status_approved = BooleanField()
     final_payment = BooleanField()
 
     def __str__(self) -> str:
