@@ -6,6 +6,7 @@ from drf_spectacular.views import (
 )
 
 from plerk.apps.api.companies import urls as companies_urls
+from plerk.apps.api.transactions import urls as transactions_urls
 
 
 app_name = 'api'
@@ -14,6 +15,10 @@ urlpatterns = [
     path(
         'companies/',
         include(companies_urls, namespace='companies')
+    ),
+    path(
+        'transactions/',
+        include(transactions_urls, namespace='transactions')
     ),
 ]
 
