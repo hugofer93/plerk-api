@@ -59,6 +59,7 @@ DEBUG_APPS = [] if not DEBUG else [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'drf_spectacular',
+    'django_celery_beat',
 ]
 
 LOCAL_APPS = [
@@ -91,8 +92,10 @@ MIDDLEWARE += [] if not DEBUG else [
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'drf_ujson.parsers.UJSONParser',
+        'djangorestframework_camel_case.parser.CamelCaseJSONParser',
     ],
     'DEFAULT_RENDERER_CLASSES': [
+        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
         'drf_ujson.renderers.UJSONRenderer',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -221,3 +224,23 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#configuration
+
+CELERY_BROKER_URL = config.get('CELERY_BROKER_URL')
+
+
+# Django Cache
+# https://docs.djangoproject.com/en/3.2/ref/settings/#caches
+# https://github.com/jazzband/django-redis
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': config.get('CACHE_LOCATION_URL'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}

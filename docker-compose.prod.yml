@@ -31,6 +31,21 @@ services:
       - "api"
     restart: "always"
 
+  celery:
+    environment:
+      DEBUG: "false"
+    volumes:
+      - .:/opt/plerk
+    command: poetry run celery -A plerk worker -l info --concurrency=2
+
+  celerybeat:
+    <<: *api
+    environment:
+      DEBUG: "false"
+    volumes:
+      - .:/opt/plerk
+    command: poetry run celery -A plerk beat -l info -S django
+
 
 volumes:
   staticfiles: {}
