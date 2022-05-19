@@ -8,6 +8,7 @@ from django.db.models import (
 )
 
 from plerk.apps.companies.models import Company
+from plerk.apps.transactions.managers import TransactionManager
 from plerk.apps.utils.models import BaseUUIDModel
 
 
@@ -27,6 +28,8 @@ class Transaction(BaseUUIDModel):
     status = CharField(max_length=10, choices=STATUS_CHOICES)
     status_approved = BooleanField()
     final_payment = BooleanField()
+
+    objects = TransactionManager()
 
     def __str__(self) -> str:
         return f'Price: {self.price} | Status: {self.status}'
