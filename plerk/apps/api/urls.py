@@ -5,10 +5,17 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from plerk.apps.api.companies import urls as companies_urls
+
 
 app_name = 'api'
 
-urlpatterns = []
+urlpatterns = [
+    path(
+        'companies/',
+        include(companies_urls, namespace='companies')
+    ),
+]
 
 docs_urlpatterns = [
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
