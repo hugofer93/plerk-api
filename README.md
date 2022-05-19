@@ -1,6 +1,6 @@
 # plerk-api
 
-This is a REST API with [Django](https://docs.djangoproject.com/en/3.2/) and [Django REST Framework](https://www.django-rest-framework.org/)
+This is a REST API with [Django](https://docs.djangoproject.com/en/3.2/), [Django REST Framework](https://www.django-rest-framework.org/), [RabbitMQ](https://www.rabbitmq.com/) and [Redis](https://redis.io/)
 
 
 ## Overview: PLERK API
@@ -21,6 +21,8 @@ This is a REST API with [Django](https://docs.djangoproject.com/en/3.2/) and [Dj
     Django              ~3.2
     djangorestframework ~3.13
     PostgreSQL          ~12.7
+    RabbitMQ            ~3.8
+    Redis               ~7.0
 
 For more details, see the [pyproject.toml file](pyproject.toml).
 
@@ -60,6 +62,14 @@ For more details, see the [pyproject.toml file](pyproject.toml).
 
 - Execute commands in container (e.g.):
 
+        docker-compose exec api poetry run python manage.py shell
+
+- Load test database (csv file):
+
+        docker-compose exec api poetry run python utility/load_csv_to_database.py
+
+- Create an Admin User for the project:
+
         docker-compose exec api poetry run python manage.py createsuperuser
 
 - Show containers logs:
@@ -67,3 +77,11 @@ For more details, see the [pyproject.toml file](pyproject.toml).
     For Django Project:
 
         docker-compose logs -f api
+
+    For Celery (*SHOW CELERY BEAT TOO, ONLY IN DEV ENVIRONMENT*):
+
+        docker-compose logs -f celery
+
+    For Celery Beat (*ONLY FOR PROD ENVIRONMENT*):
+
+        docker-compose logs -f celerybeat
