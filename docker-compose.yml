@@ -53,6 +53,14 @@ services:
       - "redis"
       - "api"
 
+  # Used ONLY IN STAGING OR PRODUCTION ENVIRONMENT.
+  celerybeat:
+    <<: *api
+    container_name: "plerk_celerybeat"
+    depends_on:
+      - "api"
+      - "celery"
+
 
 volumes:
   postgres_data: {}

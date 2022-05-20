@@ -4,14 +4,17 @@ services:
   api:
     environment:
       DEBUG: "false"
+      VIRTUAL_HOST: "plerk-api.devlance.me"
+      VIRTUAL_PORT: "8000"
+      LETSENCRYPT_HOST: "plerk-api.devlance.me"
+      LETSENCRYPT_EMAIL: "admin@devlance.me"
     expose:
       - "8000"
-    ports:
-      - "8000:8000"
     volumes:
       - "staticfiles:/opt/plerk/staticfiles/"
     command: >
-      sh -c "poetry run python manage.py makemigrations --noinput
+      sh -c "poetry install --no-dev --no-root
+      && poetry run python manage.py makemigrations --noinput
       && poetry run python manage.py migrate --noinput
       && poetry run python manage.py collectstatic --noinput
       && poetry run uwsgi --ini utility/uwsgi.ini"
@@ -19,33 +22,62 @@ services:
 
   nginx:
     container_name: "plerk_nginx"
-    image: "nginx:1.20-alpine"
-    expose:
-      - "80"
+    image: "nginxproxy/nginx-proxy:alpine"
     ports:
       - "80:80"
+      - "443:443"
     volumes:
+      - "nginx_certs:/etc/nginx/certs"
+      - "nginx_html:/usr/share/nginx/html:rw"
       - "staticfiles:/usr/share/nginx/html/staticfiles:ro"
-      - "./utility/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
+      - "./utility/nginx-vhost.d:/etc/nginx/vhost.d"
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
     depends_on:
       - "api"
+    restart: "always"
+
+  letsencrypt:
+    container_name: "plerk_letsencrypt"
+    image: "nginxproxy/acme-companion:2.2"
+    environment:
+      VIRTUAL_HOST: "plerk-api.devlance.me"
+      LETSENCRYPT_HOST: "plerk-api.devlance.me"
+      LETSENCRYPT_EMAIL: "admin@devlance.me"
+      DEFAULT_EMAIL: "admin@devlance.me"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "nginx_certs:/etc/nginx/certs"
+      - "nginx_html:/usr/share/nginx/html:rw"
+      - "./utility/nginx-vhost.d:/etc/nginx/vhost.d"
+    volumes_from:
+      - "nginx"
+    depends_on:
+      - "nginx"
     restart: "always"
 
   celery:
     environment:
       DEBUG: "false"
+      POETRY_VIRTUALENVS_IN_PROJECT: "0"
     volumes:
       - .:/opt/plerk
-    command: poetry run celery -A plerk worker -l info --concurrency=2
+    command: >
+      sh -c "poetry install --no-dev --no-root
+      && poetry run celery -A plerk worker -l info --concurrency=2"
 
   celerybeat:
-    <<: *api
     environment:
       DEBUG: "false"
+      POETRY_VIRTUALENVS_IN_PROJECT: "0"
     volumes:
       - .:/opt/plerk
-    command: poetry run celery -A plerk beat -l info -S django
+    command: >
+      sh -c "poetry install --no-dev --no-root
+      && poetry run celery -A plerk beat -l info -S django"
 
 
 volumes:
+  nginx_certs: {}
+  nginx_html: {}
+  nginx_vhost: {}
   staticfiles: {}
