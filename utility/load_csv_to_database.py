@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from csv import reader as csv_reader
+from decimal import Decimal
 from distutils.util import strtobool
 from os import environ
 from sys import exit, path
@@ -46,17 +47,28 @@ with open('utility/test_database.csv', 'r') as file:
             name=row[COMPANY_NAME_INDEX]
         )
 
+        # Fix the price
+        price = row[PRICE_INDEX]
+        if len(price.split('.')) == 1:
+            price = Decimal(price)
+            price = round(price / 100, ndigits=2)
+
         # Create transaction
         transaction = Transaction(
             company=company,
-            price=row[PRICE_INDEX],
+            price=price,
             date=row[DATE_INDEX],
             status=row[STATUS_TRANSACTION_INDEX],
             status_approved=bool(strtobool(row[STATUS_APPROVED_INDEX])),
             final_payment=False
         )
+
+        # Calculate tax
+        transaction.tax_value = Transaction.calculate_tax(transaction.price)
+
         if transaction.status_approved and transaction.status == 'closed':
             transaction.final_payment = True
+
         transaction.save()
         print(
             f'Company: {company}'
