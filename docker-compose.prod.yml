@@ -4,6 +4,7 @@ services:
   api:
     environment:
       DEBUG: "false"
+      POETRY_VIRTUALENVS_IN_PROJECT: "0"
       VIRTUAL_HOST: "plerk-api.devlance.me"
       VIRTUAL_PORT: "8000"
       LETSENCRYPT_HOST: "plerk-api.devlance.me"
@@ -12,6 +13,7 @@ services:
       - "8000"
     volumes:
       - "staticfiles:/opt/plerk/staticfiles/"
+      - ".:/opt/plerk"
     command: >
       sh -c "poetry install --no-dev --no-root
       && poetry run python manage.py makemigrations --noinput
@@ -40,9 +42,6 @@ services:
     container_name: "plerk_letsencrypt"
     image: "nginxproxy/acme-companion:2.2"
     environment:
-      VIRTUAL_HOST: "plerk-api.devlance.me"
-      LETSENCRYPT_HOST: "plerk-api.devlance.me"
-      LETSENCRYPT_EMAIL: "admin@devlance.me"
       DEFAULT_EMAIL: "admin@devlance.me"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -60,7 +59,7 @@ services:
       DEBUG: "false"
       POETRY_VIRTUALENVS_IN_PROJECT: "0"
     volumes:
-      - .:/opt/plerk
+      - ".:/opt/plerk"
     command: >
       sh -c "poetry install --no-dev --no-root
       && poetry run celery -A plerk worker -l info --concurrency=2"
@@ -70,7 +69,7 @@ services:
       DEBUG: "false"
       POETRY_VIRTUALENVS_IN_PROJECT: "0"
     volumes:
-      - .:/opt/plerk
+      - ".:/opt/plerk"
     command: >
       sh -c "poetry install --no-dev --no-root
       && poetry run celery -A plerk beat -l info -S django"

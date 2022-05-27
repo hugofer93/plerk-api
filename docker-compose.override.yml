@@ -5,7 +5,7 @@ services:
     environment:
       DEBUG: "true"
     volumes:
-      - .:/opt/plerk
+      - ".:/opt/plerk"
     expose:
       - "8000"
     ports:
@@ -20,5 +20,5 @@ services:
     environment:
       DEBUG: "true"
     volumes:
-      - .:/opt/plerk
+      - ".:/opt/plerk"
     command: poetry run celery -A plerk worker --beat --scheduler django --loglevel=info
